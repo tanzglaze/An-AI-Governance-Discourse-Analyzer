@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Governance Analyzer — [Your Name]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F2EC;
+    --surface: #EDEAE2;
+    --ink: #1A1814;
+    --ink2: #4A4640;
+    --ink3: #8A8580;
+    --accent: #2D5A3D;
+    --accent2: #C4501A;
+    --rule: #D4CFC5;
+    --white: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Instrument Sans', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(245,242,236,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 2rem; height: 52px;
+  }
+  .nav-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; letter-spacing: 0.06em;
+    color: var(--ink2);
+  }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a {
+    font-size: 13px; color: var(--ink3);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 800px; margin: 0 auto; padding: 0 2rem; }
+  section { padding: 5rem 0; border-top: 1px solid var(--rule); }
+  section:first-of-type { border-top: none; }
+
+  /* ── HERO ── */
+  .hero { padding: 8rem 0 5rem; }
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink3);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(44px, 8vw, 76px);
+    line-height: 1.03; letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-body {
+    font-size: 17px; color: var(--ink2);
+    max-width: 500px; line-height: 1.8;
+    margin-bottom: 2.5rem;
+  }
+  .hero-links { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 10px 22px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    border-radius: 2px;
+    text-decoration: none;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .btn-dark { background: var(--ink); color: var(--bg); border: 1px solid var(--ink); }
+  .btn-dark:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--rule); }
+  .btn-outline:hover { border-color: var(--ink3); }
+
+  /* ── SECTION HEADS ── */
+  .mono-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink3);
+    margin-bottom: 2rem;
+  }
+
+  /* ── ABOUT ── */
+  .about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; }
+  .about-text p { font-size: 15px; color: var(--ink2); }
+  .about-text p + p { margin-top: 1rem; }
+  .tag-list { display: flex; flex-direction: column; gap: 10px; padding-top: 4px; }
+  .tag-item {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; color: var(--ink3);
+  }
+  .tag-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── ANALYZER ── */
+  #analyzer { background: var(--bg); }
+  .analyzer-intro { margin-bottom: 2.5rem; }
+  .analyzer-intro h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+  }
+  .analyzer-intro p { font-size: 14px; color: var(--ink2); max-width: 540px; }
+
+  .sample-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .sample-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; padding: 5px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 20px;
+    background: transparent; color: var(--ink3);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .sample-pill:hover { border-color: var(--ink3); color: var(--ink); }
+  .sample-pill.active { border-color: var(--accent); color: var(--accent); background: #EAF2ED; }
+
+  textarea {
+    width: 100%; min-height: 150px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; line-height: 1.7;
+    padding: 14px 16px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    background: var(--white);
+    color: var(--ink);
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+  textarea:focus { outline: none; border-color: var(--ink3); }
+
+  .toolbar { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+  .analyze-btn {
+    padding: 9px 26px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px; font-weight: 500;
+    border-radius: 2px;
+    background: var(--ink); color: var(--bg);
+    border: none; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .analyze-btn:hover { background: var(--accent); }
+  .demo-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--ink3);
+  }
+
+  /* Results */
+  .results { margin-top: 3rem; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .results-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 2rem; }
+  .metric {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 14px;
+  }
+  .metric-label { font-size: 11px; color: var(--ink3); margin-bottom: 6px; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+  .metric-val { font-size: 18px; font-weight: 500; color: var(--ink); line-height: 1.2; }
+  .metric-sub { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+
+  .result-section { margin-bottom: 2rem; }
+  .result-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink3);
+    margin-bottom: 12px;
+  }
+
+  .summary-box {
+    background: var(--surface);
+    border-radius: 4px; padding: 16px 18px;
+    font-size: 14px; color: var(--ink2); line-height: 1.75;
+  }
+
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+  .bar-name { font-size: 13px; color: var(--ink2); width: 140px; flex-shrink: 0; }
+  .bar-track { flex: 1; height: 5px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.7s cubic-bezier(.4,0,.2,1); }
+  .bar-pct { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--ink3); width: 34px; text-align: right; }
+
+  .themes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .theme-chip {
+    font-size: 12px; padding: 5px 13px;
+    border-radius: 20px;
+  }
+
+  .concern {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .concern-top { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+  .sev {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; padding: 3px 9px;
+    border-radius: 20px; font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .sev-high  { background: #FAECE7; color: #993C1D; }
+  .sev-med   { background: #FDF0DC; color: #7A4A10; }
+  .sev-low   { background: #DFF0E4; color: #1A5C30; }
+  .concern-title { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .concern-desc  { font-size: 13px; color: var(--ink2); line-height: 1.65; }
+
+  /* ── PROJECT CARD ── */
+  .project-card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 4px; overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .card-stripe { height: 5px; }
+  .card-body { padding: 1.75rem 2rem; }
+  .card-badges { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; padding: 3px 10px;
+    border-radius: 20px; letter-spacing: 0.04em;
+  }
+  .badge-green { background: #DFF0E4; color: #1A5C30; }
+  .badge-blue  { background: #DCE8F8; color: #1A3E7A; }
+  .badge-amber { background: #FDF0DC; color: #7A4A10; }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .card-desc { font-size: 14px; color: var(--ink2); line-height: 1.75; margin-bottom: 1.2rem; }
+  .tech-stack { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.2rem; }
+  .tech {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--ink3);
+    border: 1px solid var(--rule);
+    padding: 3px 10px; border-radius: 2px;
+  }
+  .card-links { display: flex; gap: 1.5rem; }
+  .card-link { font-size: 13px; font-weight: 500; color: var(--accent); text-decoration: none; }
+  .card-link:hover { text-decoration: underline; }
+
+  /* ── EXPERIENCE ── */
+  .timeline { position: relative; padding-left: 1.5rem; }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 0; top: 8px; bottom: 8px;
+    width: 1px; background: var(--rule);
+  }
+  .tl-item { position: relative; margin-bottom: 2.25rem; }
+  .tl-dot {
+    position: absolute; left: -1.78rem; top: 8px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--bg); border: 1.5px solid var(--accent);
+  }
+  .tl-when { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3); margin-bottom: 4px; }
+  .tl-role { font-size: 15px; font-weight: 500; margin-bottom: 2px; }
+  .tl-org  { font-size: 13px; color: var(--ink3); margin-bottom: 6px; }
+  .tl-desc { font-size: 14px; color: var(--ink2); }
+
+  /* ── INTERESTS ── */
+  .interests-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .interest {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 4px; padding: 1.25rem;
+  }
+  .int-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px; color: var(--rule); margin-bottom: 8px;
+    line-height: 1;
+  }
+  .int-title { font-size: 14px; font-weight: 500; margin-bottom: 5px; }
+  .int-desc  { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+
+  /* ── CONTACT ── */
+  .contact-wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem; }
+  .contact-text { font-size: 16px; color: var(--ink2); max-width: 400px; line-height: 1.75; }
+  .contact-email {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--ink);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .contact-email:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 2rem 0;
+    border-top: 1px solid var(--rule);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--ink3);
+    flex-wrap: wrap; gap: 1rem;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .interests-grid { grid-template-columns: 1fr 1fr; }
+    .results-grid { grid-template-columns: 1fr 1fr; }
+    nav .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-name">[Your Name]</span>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#analyzer">Analyzer</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="eyebrow">Research Portfolio · 2025</p>
+    <h1>Where <em>intelligence</em><br>meets institution</h1>
+    <p class="hero-body">
+      I study AI at the intersection of economics, governance, and social systems —
+      and build tools that make that research tangible.
+    </p>
+    <div class="hero-links">
+      <a href="https://github.com/yourusername" class="btn btn-dark">GitHub ↗</a>
+      <a href="#analyzer" class="btn btn-outline">See live demo</a>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="mono-label">About</p>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>My work sits at a genuinely unusual crossroads: I care about how AI systems interact with real institutions — regulatory bodies, labour markets, democratic processes — and I build prototypes to test those ideas empirically.</p>
+        <p style="margin-top:1rem;">I believe the most urgent questions in AI aren't purely technical. They're about who AI systems serve, who governs them, and what happens when those answers conflict.</p>
+      </div>
+      <div class="tag-list">
+        <div class="tag-item"><span class="tag-dot"></span>AI ethics &amp; governance</div>
+        <div class="tag-item"><span class="tag-dot"></span>Economics of automation</div>
+        <div class="tag-item"><span class="tag-dot"></span>NLP &amp; discourse analysis</div>
+        <div class="tag-item"><span class="tag-dot"></span>Policy design &amp; evaluation</div>
+        <div class="tag-item"><span class="tag-dot"></span>Community technology</div>
+        <div class="tag-item"><span class="tag-dot"></span>Knowledge systems</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANALYZER -->
+  <section id="analyzer">
+    <p class="mono-label">Featured tool</p>
+    <div class="analyzer-intro">
+      <h2>AI governance discourse analyzer</h2>
+      <p>Paste any AI policy text — a regulation excerpt, think-tank report, or government statement — to surface its tone profile, ethical dimensions, and key themes.</p>
+    </div>
+
+    <div class="sample-row">
+      <button class="sample-pill active" onclick="loadSample(0,this)">EU AI Act</button>
+      <button class="sample-pill" onclick="loadSample(1,this)">US Executive Order</button>
+      <button class="sample-pill" onclick="loadSample(2,this)">UN Secretary General</button>
+    </div>
+
+    <textarea id="inputText"></textarea>
+
+    <div class="toolbar">
+      <button class="analyze-btn" onclick="runAnalysis()">Analyze text</button>
+      <span class="demo-note">Demo mode — results are pre-computed examples</span>
+    </div>
+
+    <div id="results" style="display:none;" class="results"></div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="mono-label">Projects</p>
+
+    <div class="project-card">
+      <div class="card-stripe" style="background: linear-gradient(90deg, #2D5A3D, #C4501A);"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-green">Featured</span>
+          <span class="badge badge-blue">NLP · Policy Analysis</span>
+        </div>
+        <div class="card-title">AI governance discourse analyzer</div>
+        <p class="card-desc">An interactive tool that analyzes AI policy texts — extracting tone profiles, flagging ethical dimensions, and mapping key themes. Built as a browser app and a Python CLI for batch corpus analysis. Designed to surface the implicit assumptions and rhetorical strategies in regulatory discourse.</p>
+        <div class="tech-stack">
+          <span class="tech">Python</span>
+          <span class="tech">Anthropic API</span>
+          <span class="tech">NLP</span>
+          <span class="tech">HTML / JS</span>
+        </div>
+        <div class="card-links">
+          <a href="https://github.com/yourusername/governance-analyzer" class="card-link">GitHub →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="card-stripe" style="background: linear-gradient(90deg, #185FA5, #534AB7);"></div>
+      <div class="card-body">
+        <div class="card-badges">
+          <span class="badge badge-amber">Data Analysis</span>
+          <span class="badge badge-blue">Economics</span>
+        </div>
+        <div class="card-title">[Add your second project here]</div>
+        <p class="card-desc">Describe a piece of analysis, a dataset you explored, or a structured write-up that demonstrates your thinking. Even well-documented research notes count as a portfolio piece.</p>
+        <div class="tech-stack">
+          <span class="tech">Python</span>
+          <span class="tech">Pandas</span>
+        </div>
+        <div class="card-links">
+          <a href="#" class="card-link">GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <p class="mono-label">Experience</p>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-when">2024 – present</div>
+        <div class="tl-role">[Your most recent role]</div>
+        <div class="tl-org">[Organisation]</div>
+        <div class="tl-desc">Replace this with your actual experience. Focus on what you built, analysed, or changed — not just job titles.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-when">2023</div>
+        <div class="tl-role">[Previous role]</div>
+        <div class="tl-org">[Organisation]</div>
+        <div class="tl-desc">What was the impact? What did you learn?</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH INTERESTS -->
+  <section id="research">
+    <p class="mono-label">Research interests</p>
+    <div class="interests-grid">
+      <div class="interest">
+        <div class="int-num">01</div>
+        <div class="int-title">Knowledge graphs &amp; AI reasoning</div>
+        <div class="int-desc">How structured knowledge shapes what AI systems can and cannot represent about the world.</div>
+      </div>
+      <div class="interest">
+        <div class="int-num">02</div>
+        <div class="int-title">Institutional AI governance</div>
+        <div class="int-desc">The gap between regulatory intent and technical implementation in AI policy frameworks.</div>
+      </div>
+      <div class="interest">
+        <div class="int-num">03</div>
+        <div class="int-title">AI &amp; economic inequality</div>
+        <div class="int-desc">How automation distributes its benefits — and who bears the adjustment costs.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="mono-label">Get in touch</p>
+    <div class="contact-wrap">
+      <p class="contact-text">I'm actively looking for research opportunities in responsible AI, governance, and socially grounded systems. Let's talk.</p>
+      <a href="mailto:you@email.com" class="contact-email">you@email.com</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>[Your Name] · Research Portfolio · 2025</span>
+    <span>Single HTML file — no frameworks</span>
+  </footer>
+
+</div><!-- /container -->
+
+<script>
+// ─── SAMPLE TEXTS ───────────────────────────────────────────────
+const SAMPLES = [
+  `The European Union's Artificial Intelligence Act establishes a risk-based approach to AI regulation, categorizing systems by their potential harm to fundamental rights. High-risk AI systems, including those used in critical infrastructure, education, employment, and law enforcement, must comply with stringent requirements around transparency, human oversight, and data governance. The Act explicitly prohibits certain AI applications deemed unacceptable risks, such as social scoring by governments and real-time biometric surveillance in public spaces. Providers of general-purpose AI models must maintain technical documentation and cooperate with national authorities. The regulation aims to ensure that AI development in Europe respects human dignity, democracy, and the rule of law while remaining competitive globally.`,
+
+  `The United States Executive Order on the Safe, Secure, and Trustworthy Development and Use of Artificial Intelligence directs federal agencies to develop standards for AI safety testing before deployment. It emphasizes that developers of the most powerful AI systems must share safety test results with the government. The order addresses risks to national security, the economy, and society, while also recognizing the technology's immense potential. It calls for protecting Americans from AI-enabled fraud and deception, advancing equity and civil rights in AI use, and supporting workers whose jobs may be affected by automation. International cooperation on AI safety standards is identified as a priority.`,
+
+  `The United Nations Secretary-General has warned that artificial intelligence poses existential risks if left ungoverned by international frameworks. Calling for a new global body modeled on the International Atomic Energy Agency, he argued that AI development outpaces humanity's collective capacity to understand its consequences. Particular concern was raised about autonomous weapons systems, algorithmic manipulation of elections, and the concentration of AI capability in a small number of private corporations. He stressed that developing nations risk being left behind in both the benefits and governance of AI, deepening existing inequalities. The Secretary-General called on member states to commit to binding international agreements before the technology becomes irreversible in its social impact.`
+];
+
+// ─── PRE-COMPUTED DEMO RESULTS ──────────────────────────────────
+const DEMO_RESULTS = [
+  {
+    sentiment_score: -20,
+    governance_approach: "regulatory",
+    summary: "The EU AI Act frames AI primarily as a risk to be managed through legal architecture, centering the discourse on rights protection and harm prevention. Its tone is precautionary and rights-oriented, deploying legalistic language to bound permissible AI use. The text treats market competitiveness as a secondary objective, rhetorically subordinate to dignity and democratic values.",
+    tone_scores: { precautionary: 82, rights_based: 91, techno_optimist: 28, security_focused: 55, equity_centered: 60 },
+    key_themes: ["fundamental rights protection", "risk stratification", "human oversight", "prohibited applications", "regulatory compliance"],
+    ethical_concerns: [
+      { title: "Surveillance overreach risk", severity: "high", description: "The prohibition on real-time biometric surveillance contains enforcement gaps that may permit state actors to exploit exception clauses, particularly in national security contexts." },
+      { title: "Regulatory asymmetry", severity: "medium", description: "High compliance burdens may disproportionately disadvantage smaller European AI developers relative to large non-EU incumbents, potentially concentrating market power." },
+      { title: "Definition ambiguity", severity: "medium", description: "The classification of 'high-risk' systems relies on contextual judgment that may produce inconsistent enforcement across member states." }
+    ]
+  },
+  {
+    sentiment_score: 15,
+    governance_approach: "technical",
+    summary: "The US Executive Order adopts a pragmatic, security-inflected framing that balances optimism about AI's potential with concern about systemic risk. Its rhetorical strategy is notably dual: it legitimizes federal oversight while simultaneously affirming innovation. The equity and labour provisions signal political breadth but receive less structural weight than safety and national security provisions.",
+    tone_scores: { precautionary: 65, rights_based: 48, techno_optimist: 55, security_focused: 88, equity_centered: 52 },
+    key_themes: ["safety testing standards", "national security", "worker displacement", "civil rights in AI", "international cooperation"],
+    ethical_concerns: [
+      { title: "Voluntary compliance gap", severity: "high", description: "Safety test-sharing requirements rely on developer cooperation without clearly defined enforcement mechanisms, creating structural incentives for non-disclosure." },
+      { title: "Equity provisions underpowered", severity: "medium", description: "While the order references civil rights and equity, these sections lack the institutional mandates and resourcing granted to security and competitiveness objectives." },
+      { title: "International coordination friction", severity: "low", description: "Prioritising US-led standards may create friction with allied nations developing competing frameworks, undermining the stated goal of global AI safety coordination." }
+    ]
+  },
+  {
+    sentiment_score: -65,
+    governance_approach: "international",
+    summary: "The Secretary-General's statement deploys existential risk framing to build urgency for a binding multilateral governance regime, positioning AI alongside nuclear technology as a civilisational-level concern. The discourse is explicitly redistributive, foregrounding inequality between developed and developing nations. The IAEA analogy is rhetorically significant: it frames AI governance as a matter of international security rather than economic regulation.",
+    tone_scores: { precautionary: 95, rights_based: 62, techno_optimist: 12, security_focused: 74, equity_centered: 85 },
+    key_themes: ["existential risk", "global governance body", "autonomous weapons", "digital inequality", "binding agreements"],
+    ethical_concerns: [
+      { title: "Autonomous weapons proliferation", severity: "high", description: "The statement identifies lethal autonomous systems as an acute near-term risk, yet the proposed governance body lacks the jurisdictional authority to regulate military AI applications." },
+      { title: "Global south exclusion", severity: "high", description: "The concentration of AI capability in a handful of corporations and states risks cementing a new form of technological dependency that mirrors historical patterns of colonial resource extraction." },
+      { title: "Democratic legitimacy of AI governance", severity: "medium", description: "An IAEA-style body risks technocratic capture, insulating AI governance decisions from democratic deliberation in the nations most affected by its outcomes." }
+    ]
+  }
+];
+
+const TONE_LABELS = {
+  precautionary:   "Precautionary",
+  rights_based:    "Rights-based",
+  techno_optimist: "Techno-optimist",
+  security_focused:"Security-focused",
+  equity_centered: "Equity-centered"
+};
+
+const TONE_COLORS = {
+  precautionary:   "#BA7517",
+  rights_based:    "#185FA5",
+  techno_optimist: "#1D9E75",
+  security_focused:"#993C1D",
+  equity_centered: "#534AB7"
+};
+
+const CHIP_STYLES = [
+  "background:#E6F1FB;color:#0C447C",
+  "background:#E1F5EE;color:#085041",
+  "background:#EEEDFE;color:#3C3489",
+  "background:#FAEEDA;color:#633806",
+  "background:#FAECE7;color:#712B13",
+  "background:#EAF3DE;color:#27500A"
+];
+
+let currentSample = 0;
+
+function loadSample(i, btn) {
+  currentSample = i;
+  document.getElementById('inputText').value = SAMPLES[i];
+  document.querySelectorAll('.sample-pill').forEach((p,j) => p.classList.toggle('active', j===i));
+  document.getElementById('results').style.display = 'none';
+}
+
+function sentimentLabel(s) {
+  if (s >  40) return "optimistic";
+  if (s >  10) return "cautiously optimistic";
+  if (s >  -10) return "neutral";
+  if (s >  -40) return "cautionary";
+  return "alarmist";
+}
+
+function runAnalysis() {
+  const r = DEMO_RESULTS[currentSample];
+  const score = r.sentiment_score;
+
+  let bars = '';
+  for (const [k, v] of Object.entries(r.tone_scores)) {
+    bars += `<div class="bar-row">
+      <span class="bar-name">${TONE_LABELS[k]}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${v}%;background:${TONE_COLORS[k]};"></div></div>
+      <span class="bar-pct">${v}%</span>
+    </div>`;
+  }
+
+  const chips = r.key_themes.map((t,i) =>
+    `<span class="theme-chip" style="${CHIP_STYLES[i % CHIP_STYLES.length]}">${t}</span>`
+  ).join('');
+
+  const concerns = r.ethical_concerns.map(c => `
+    <div class="concern">
+      <div class="concern-top">
+        <span class="sev sev-${c.severity === 'high' ? 'high' : c.severity === 'medium' ? 'med' : 'low'}">${c.severity}</span>
+        <span class="concern-title">${c.title}</span>
+      </div>
+      <p class="concern-desc">${c.description}</p>
+    </div>`).join('');
+
+  document.getElementById('results').innerHTML = `
+    <div class="results-grid">
+      <div class="metric">
+        <div class="metric-label">Sentiment</div>
+        <div class="metric-val">${sentimentLabel(score)}</div>
+        <div class="metric-sub">score ${score > 0 ? '+' : ''}${score}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Approach</div>
+        <div class="metric-val" style="font-size:15px;padding-top:2px;">${r.governance_approach}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Themes</div>
+        <div class="metric-val">${r.key_themes.length}</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Concerns</div>
+        <div class="metric-val">${r.ethical_concerns.length}</div>
+      </div>
+    </div>
+
+    <div class="result-section">
+      <div class="result-label">Analytical summary</div>
+      <div class="summary-box">${r.summary}</div>
+    </div>
+
+    <div class="result-section">
+      <div class="result-label">Discourse tone profile</div>
+      ${bars}
+    </div>
+
+    <div class="result-section">
+      <div class="result-label">Key themes</div>
+      <div class="themes">${chips}</div>
+    </div>
+
+    <div class="result-section">
+      <div class="result-label">Ethical dimensions flagged</div>
+      ${concerns}
+    </div>
+  `;
+
+  const el = document.getElementById('results');
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Load first sample on page load
+loadSample(0, null);
+document.querySelector('.sample-pill').classList.add('active');
+</script>
+</body>
+</html>
